@@ -15,6 +15,7 @@ class SpaceSeeder extends Seeder
     {
         Space::factory()->create([
             'name' => 'Big saloon',
+            'type' => 'saloon',
             'description' => 'A spacious and elegant venue for large gatherings and events.',
             'image' => 'big_space.jpg',
             'capacity' => 100,
@@ -22,6 +23,7 @@ class SpaceSeeder extends Seeder
 
         Space::factory()->create([
             'name' => 'Small saloon',
+            'type' => 'saloon',
             'description' => 'A cozy and intimate space for small gatherings and events.',
             'image' => 'small_space.jpg',
             'capacity' => 10,
@@ -29,6 +31,7 @@ class SpaceSeeder extends Seeder
 
         Space::factory()->create([
             'name' => 'House with pool',
+            'type' => 'Outdoor',
             'description' => 'A beautiful house with a swimming pool, perfect for relaxing and enjoying the outdoors.',
             'image' => 'house_pool.jpg',
             'capacity' => 25,
