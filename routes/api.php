@@ -1,8 +1,9 @@
 <?php
-use Illuminate\Support\Facades\Route; // Add this line
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\SpaceController;
+use App\Http\Middlewares\IsAdmin;
 use App\Http\Middlewares\IsOwnReservation;
 
 Route::post('register', [AuthController::class, 'register']);
@@ -21,6 +22,18 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::get('', [ReservationController::class, 'getById']);
       Route::put('', [ReservationController::class, 'update']);
       Route::delete('', [ReservationController::class, 'delete']);
+    });
+  });
+
+  Route::get('space/search', [SpaceController::class, 'query']);
+
+  Route::prefix('space')->middleware(IsAdmin::class)->group(function () {
+    Route::post('', [SpaceController::class, 'store']);
+    Route::get('', [SpaceController::class, 'get']);
+    Route::prefix('{id}')->group(function () {
+      Route::get('', [SpaceController::class, 'getById']);
+      Route::put('', [SpaceController::class, 'update']);
+      Route::delete('', [SpaceController::class, 'delete']);
     });
   });
 

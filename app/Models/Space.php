@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Reservation;
+use Carbon\Carbon;
 
 class Space extends Model
 {
@@ -12,9 +13,14 @@ class Space extends Model
 
     public $timestamps = false;
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
     static function getAvailableTimeSlots($space_id, $dayStart, $dayEnd)
     {
-        $allSlots = Reservation::getTimeSlots($dayStart, $dayEnd);
+        $allSlots = Reservation::getTimeSlots((new Carbon($dayStart))->startOfDay(), (new Carbon($dayEnd))->endOfDay());
         $reservations = Reservation::getReservationsInRange($space_id, $dayStart, $dayEnd);
     
         $availableSlots = [];

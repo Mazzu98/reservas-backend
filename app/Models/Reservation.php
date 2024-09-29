@@ -20,6 +20,11 @@ class Reservation extends Model
         'end_date',
     ];
 
+    public function space()
+    {
+        return $this->belongsTo(Space::class);
+    }
+
     public static function getReservationsInRange($space_id, $start, $end)
     {
         return self::where('space_id', $space_id)
@@ -38,11 +43,11 @@ class Reservation extends Model
 {
     $timeSlots = [];
     
-    $currentDay = (new Carbon($dayStart))->startOfDay();
-    $endDay = (new Carbon($dayEnd))->endOfDay();
+    $currentDay = $dayStart;
+    $endDay = $dayEnd;
     
-    $startHour = env('SCHEDULE_START_HOUR', 8);
-    $endHour = env('SCHEDULE_END_HOUR', 22);
+    $startHour = (int) env('SCHEDULE_START_HOUR', 8);
+    $endHour = (int) env('SCHEDULE_END_HOUR', 22);
 
     while ($currentDay <= $endDay) {
         $dayStart = $currentDay->copy()->hour($startHour)->minute(0);

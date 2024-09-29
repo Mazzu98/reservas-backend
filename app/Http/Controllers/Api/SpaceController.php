@@ -43,18 +43,18 @@ class SpaceController extends Controller
         $dayEnd = Carbon::now()->addWeeks($weekFromThis)->endOfWeek();
         $spaces = new Collection(Space::getAvailableTimeSlots($id, $dayStart, $dayEnd));
         $spaces = $spaces
-        ->groupBy(function ($space) {
-            return $space['start']->format('Y-m-d');
-        })
-        ->map(function ($spaces) {
-            foreach ($spaces as $space) {
-                $formattedSpaces[] = [
-                    'start' => $space['start']->format('H:i'),
-                    'end' => $space['end']->format('H:i')
-                ];
-            }
-            return $formattedSpaces;
-        });
+            ->groupBy(function ($space) {
+                return $space['start']->format('Y-m-d');
+            })
+            ->map(function ($spaces) {
+                foreach ($spaces as $space) {
+                    $formattedSpaces[] = [
+                        'start' => $space['start']->format('H:i'),
+                        'end' => $space['end']->format('H:i')
+                    ];
+                }
+                return $formattedSpaces;
+            });
         return response()->json($spaces);
     }
 
@@ -66,6 +66,7 @@ class SpaceController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
+            'type' => 'required|string',
             'image' => 'required|string',
             'capacity' => 'required|integer',
         ]);
@@ -85,15 +86,37 @@ class SpaceController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * query the specified resource.
      */
-    public function query(int $capacity, string $type)
+    public function query(Request $request)
     {
-        $spaces = Space::where('capacity', '>=', $capacity)
-                        ->where('type', $type)
-                        ->get();
+        $type = $request->query('type');
+        $capacity = $request->query('capacity');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $spaces = Space::query();
+
+        if ($type) {
+            $spaces->whereRaw('LOWER(type) LIKE ?', [strtolower($type) . '%']);
+        }
+
+        if ($capacity) {
+            $spaces->where('capacity', '>=', $capacity);
+        }
+
+        if ($startDate && $endDate) {
+            $spaces->whereDoesntHave('reservations', function ($query) use ($startDate, $endDate) {
+                $query->where('start_date', '<', $endDate)
+                    ->where('end_date', '>', $startDate);
+            });
+        }
+
+        $spaces = $spaces->get();
+
         return response()->json($spaces);
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -103,6 +126,7 @@ class SpaceController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
+            'type' => 'required|string',
             'image' => 'required|string',
             'capacity' => 'required|integer',
         ]);
