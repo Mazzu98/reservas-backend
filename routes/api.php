@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('', [SpaceController::class, 'get']);
     Route::prefix('{id}')->group(function () {
       Route::get('', [SpaceController::class, 'getById']);
-      Route::put('', [SpaceController::class, 'update']);
+      Route::patch('', [SpaceController::class, 'update']);
       Route::delete('', [SpaceController::class, 'delete']);
     });
   });

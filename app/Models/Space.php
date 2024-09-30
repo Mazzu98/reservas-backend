@@ -13,6 +13,21 @@ class Space extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'name',
+        'type',
+        'description',
+        'capacity',
+        'image',
+    ];
+
+    protected $appends = ['image_url'];
+    
+    public function getImageUrlAttribute()
+    {
+        return asset('storage/' . $this->image);
+    }
+
     public function reservations()
     {
         return $this->hasMany(Reservation::class);

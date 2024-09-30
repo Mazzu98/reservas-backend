@@ -7,20 +7,21 @@ use Illuminate\Http\Request;
 use App\Models\Space;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class SpaceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * get a listing of the resource.
      */
-    public function index()
+    public function get()
     {
         $spaces = Space::all();
         return response()->json($spaces);
     }
 
     /**
-     * Display schedule availability of the resource.
+     * Get schedule availability of the resource.
      */
     public function getDailyAvailableTimeSlots(int $id, Request $request)
     {
@@ -36,6 +37,9 @@ class SpaceController extends Controller
         return response()->json($spaces);
     }
 
+    /**
+     * get weekly available time slots.
+     */
     public function getWeeklyAvailableTimeSlots(int $id, Request $request)
     {
         $weekFromThis = (int) $request->query('weekFromThis');
@@ -67,19 +71,25 @@ class SpaceController extends Controller
             'name' => 'required|string',
             'description' => 'required|string',
             'type' => 'required|string',
-            'image' => 'required|string',
             'capacity' => 'required|integer',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
+            $data['image'] = $imagePath;
+        }
+
         Space::create($data);
+
 
         return response()->json(['message' => 'Space created successfully'], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Get the specified resource.
      */
-    public function show(string $id)
+    public function getById(string $id)
     {
         $space = Space::findOrFail($id);
         return response()->json($space);
@@ -127,21 +137,33 @@ class SpaceController extends Controller
             'name' => 'required|string',
             'description' => 'required|string',
             'type' => 'required|string',
-            'image' => 'required|string',
             'capacity' => 'required|integer',
+            'image' => 'nullable|file|mimes:jpg,png,jpeg|max:2048',
         ]);
 
         $space = Space::findOrFail($id);
+
+        if ($request->hasFile('image')) {
+            if ($space->image) {
+                Storage::delete('public/' . $space->image);
+            }
+
+            $imagePath = $request->file('image')->store('images', 'public');
+            $data['image'] = $imagePath;
+        }
+
         $space->update($data);
+
         return response()->json(['message' => 'Space updated successfully']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function delete(string $id)
     {
         $space = Space::findOrFail($id);
+        Storage::delete('public/' . $space->image);
         $space->delete();
 
         return response()->json(['message' => 'Space deleted successfully']);
