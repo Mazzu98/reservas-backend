@@ -5,27 +5,28 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-       $request->validate([
-           'name' => 'required|string|max:255',
-           'email' => 'required|string|email|max:255|unique:users',
-           'password' => 'required|string|min:8|confirmed',
-       ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
-       $user = User::create([
-           'name' => $request->name,
-           'email' => $request->email,
-           'password' => Hash::make($request->password),
-       ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-       $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
-       return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function login(Request $request)
@@ -35,26 +36,26 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-          return response()->json(['message' => 'Invalid login details'], 401);
+        try {
+            if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
+                return response()->json(['message' => 'Invalid login details'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Could not create token'], 500);
         }
-
-        $user = User::where('email', $request->email)->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json(['message' => 'Logged out successfully']);
     }
 
-   public function user(Request $request)
-   {
-       return response()->json($request->user());
-   }
- }
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
+}
