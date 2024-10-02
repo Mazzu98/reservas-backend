@@ -13,17 +13,51 @@ use Illuminate\Support\Facades\Storage;
 class SpaceController extends Controller
 {
     /**
-     * get a listing of the resource.
+     * @OA\Get(
+     *     path="/api/space",
+     *     tags={"Space"},
+     *     summary="List all enabled spaces",
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="name", type="string", example="Small saloon"),
+     *                 @OA\Property(property="type", type="string", example="saloon"),
+     *                 @OA\Property(property="description", type="string", example="A cozy and intimate space for small gatherings and events."),
+     *                 @OA\Property(property="capacity", type="integer", example=10),
+     *                 @OA\Property(property="enable", type="boolean", example=true),
+     *                 @OA\Property(property="image_url", type="string", example="http://example.com/small_space.jpg"),
+     *             ),
+     *         ),
+     *        description="Spaces"
+     *    ),
+     * )
      */
     public function get()
     {
         $spaces = Space::where('enable', true)
-                        ->get();
+            ->get();
         return response()->json($spaces);
     }
 
     /**
-     * Get schedule availability of the resource.
+     * @OA\Get(
+     *     path="/api/space/{id}/daily-available-slots",
+     *     tags={"Space"},
+     *     summary="List Available Time Slots for a Space",
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="start", type="string", example="08:00"),
+     *                 @OA\Property(property="end", type="string", example="08:30"),
+     *         ),
+     *        description="Available times"
+     *    ),
+     * )
      */
     public function getDailyAvailableTimeSlots(int $id, Request $request)
     {
@@ -41,32 +75,29 @@ class SpaceController extends Controller
     }
 
     /**
-     * get weekly available time slots.
-     */
-    public function getWeeklyAvailableTimeSlots(int $id, Request $request)
-    {
-        $weekFromThis = (int) $request->query('weekFromThis');
-        $dayStart = Carbon::now()->addWeeks($weekFromThis)->startOfWeek();
-        $dayEnd = Carbon::now()->addWeeks($weekFromThis)->endOfWeek();
-        $spaces = new Collection(Space::getAvailableTimeSlots($id, $dayStart, $dayEnd));
-        $spaces = $spaces
-            ->groupBy(function ($space) {
-                return $space['start']->format('Y-m-d');
-            })
-            ->map(function ($spaces) {
-                foreach ($spaces as $space) {
-                    $formattedSpaces[] = [
-                        'start' => $space['start']->format('H:i'),
-                        'end' => $space['end']->format('H:i')
-                    ];
-                }
-                return $formattedSpaces;
-            });
-        return response()->json($spaces);
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/space",
+     *     tags={"Space"},
+     *     summary="Create a space",
+     *     security={{ "bearerAuth": {} }},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"description","type","capacity","image"},
+     *              @OA\Property(property="description", type="string", example="A cozy and intimate space for small gatherings and events."),
+     *              @OA\Property(property="type", type="string", example="saloon"),
+     *              @OA\Property(property="capacity", type="integer", example=10),
+     *              @OA\Property(property="image", type="string", format="binary"),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="Result message"
+     *    ),
+     * )
      */
     public function store(Request $request)
     {
@@ -90,7 +121,25 @@ class SpaceController extends Controller
     }
 
     /**
-     * Get the specified resource.
+     * @OA\Get(
+     *     path="/api/space/{id}",
+     *     tags={"Space"},
+     *     summary="space",
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="name", type="string", example="Small saloon"),
+     *                 @OA\Property(property="type", type="string", example="saloon"),
+     *                 @OA\Property(property="description", type="string", example="A cozy and intimate space for small gatherings and events."),
+     *                 @OA\Property(property="capacity", type="integer", example=10),
+     *                 @OA\Property(property="enable", type="boolean", example=true),
+     *                 @OA\Property(property="image_url", type="string", example="http://example.com/small_space.jpg"),
+     *         ),
+     *        description="Space"
+     *    ),
+     * )
      */
     public function getById(string $id)
     {
@@ -99,7 +148,28 @@ class SpaceController extends Controller
     }
 
     /**
-     * Query the specified resource with available time slots.
+     * @OA\Get(
+     *     path="/api/space/search?type=${type}&capacity=${capacity}&start_date=${startDate}&end_date=${endDate}",
+     *     tags={"Space"},
+     *     summary="Available spaces for a given filter",
+     *    security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="name", type="string", example="Small saloon"),
+     *                 @OA\Property(property="type", type="string", example="saloon"),
+     *                 @OA\Property(property="description", type="string", example="A cozy and intimate space for small gatherings and events."),
+     *                 @OA\Property(property="capacity", type="integer", example=10),
+     *                 @OA\Property(property="enable", type="boolean", example=true),
+     *                 @OA\Property(property="image_url", type="string", example="http://example.com/small_space.jpg"),
+     *             ),
+     *         ),
+     *        description="Available Spaces"
+     *    ),
+     * )
      */
     public function query(Request $request)
     {
@@ -119,8 +189,8 @@ class SpaceController extends Controller
         }
 
         $allSpaces = $spaces->where('enable', true)
-                            ->get();
-                            
+            ->get();
+
         $availableSpaces = [];
         $timeSlots = Reservation::getTimeSlots(new Carbon($startDate), new Carbon($endDate));
 
@@ -149,7 +219,29 @@ class SpaceController extends Controller
 
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/space/{id}",
+     *     tags={"Space"},
+     *     summary="Update a space",
+     *    security={{ "bearerAuth": {} }},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"description","type","capacity","image"},
+     *              @OA\Property(property="description", type="string", example="A cozy and intimate space for small gatherings and events."),
+     *              @OA\Property(property="type", type="string", example="saloon"),
+     *              @OA\Property(property="capacity", type="integer", example=10),
+     *              @OA\Property(property="image", type="string", format="binary"),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="Result message"
+     *    ),
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -178,7 +270,19 @@ class SpaceController extends Controller
     }
 
     /**
-     * soft delete the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/space/{id}",
+     *     tags={"Space"},
+     *     summary="Delete reservation",
+     *   security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="Result messge"
+     *    ),
+     * )
      */
     public function delete(string $id)
     {

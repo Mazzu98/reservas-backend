@@ -1,0 +1,861 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Swagger with Laravel",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a user",
+                "operationId": "8e4e3cb7b46126f4696379d3c7eeb4ad",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "format": "name",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "some@email.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token of created user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "operationId": "222b2625838e3c57e017987f73598fda",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "some@email.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token of created user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get user info",
+                "operationId": "961ad57987905b44ae2e2f40b82e76de",
+                "responses": {
+                    "200": {
+                        "description": "User info",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Client"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "client@client.com"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-09-28T02:28:52.000000Z"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-09-28T02:28:52.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-09-28T02:28:52.000000Z"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "client"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservation": {
+            "get": {
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Get user reservations",
+                "operationId": "28750d1ef9043e60393d17cae7bfaa23",
+                "responses": {
+                    "200": {
+                        "description": "User reservations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 13
+                                            },
+                                            "space_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "event_name": {
+                                                "type": "string",
+                                                "example": "Some festival"
+                                            },
+                                            "start_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-10-02 12:30:00"
+                                            },
+                                            "end_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-10-02 15:00:00"
+                                            },
+                                            "space_name": {
+                                                "type": "string",
+                                                "example": "Big saloon"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Create a reservation",
+                "operationId": "1609a7fc7630f503e45c5f6d2d4cde08",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "space_id",
+                                    "event_name",
+                                    "start_date",
+                                    "end_date"
+                                ],
+                                "properties": {
+                                    "space_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "event_name": {
+                                        "type": "string",
+                                        "example": "Some festival"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-10-02 12:30:00"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-10-02 15:00:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "result message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/reservation/{id}": {
+            "get": {
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Get particular user reservation",
+                "operationId": "b14230469fb85e8a018c7c5f903dea80",
+                "responses": {
+                    "200": {
+                        "description": "User reservation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 13
+                                        },
+                                        "space_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "event_name": {
+                                            "type": "string",
+                                            "example": "Some festival"
+                                        },
+                                        "start_date": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-10-02 12:30:00"
+                                        },
+                                        "end_date": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-10-02 15:00:00"
+                                        },
+                                        "space_name": {
+                                            "type": "string",
+                                            "example": "Big saloon"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Update a reservation",
+                "operationId": "59ed340248fdebd6e9c2ef7b3a8e2f23",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "space_id",
+                                    "event_name",
+                                    "start_date",
+                                    "end_date"
+                                ],
+                                "properties": {
+                                    "space_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "event_name": {
+                                        "type": "string",
+                                        "example": "Some festival"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-10-02 12:30:00"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-10-02 15:00:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Result message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Delete reservation",
+                "operationId": "ef1c18f96166fc3677496981d3cd4542",
+                "responses": {
+                    "200": {
+                        "description": "Result messge",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/space": {
+            "get": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "List all enabled spaces",
+                "operationId": "d86141499ab1e32ed7c3d0c1964184e7",
+                "responses": {
+                    "200": {
+                        "description": "Spaces",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Small saloon"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "saloon"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "A cozy and intimate space for small gatherings and events."
+                                            },
+                                            "capacity": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "enable": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "image_url": {
+                                                "type": "string",
+                                                "example": "http://example.com/small_space.jpg"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Create a space",
+                "operationId": "4d91b42a570a9811ab8eb557987c49bd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "type",
+                                    "capacity",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A cozy and intimate space for small gatherings and events."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "saloon"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Result message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/space/{id}/daily-available-slots": {
+            "get": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "List Available Time Slots for a Space",
+                "operationId": "d4d39a798f8c53300ef0778bc3e027b8",
+                "responses": {
+                    "200": {
+                        "description": "Available times",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "start": {
+                                            "type": "string",
+                                            "example": "08:00"
+                                        },
+                                        "end": {
+                                            "type": "string",
+                                            "example": "08:30"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/space/{id}": {
+            "get": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "space",
+                "operationId": "5e5c4bf62fc2942a880bb9e98e7c7136",
+                "responses": {
+                    "200": {
+                        "description": "Space",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Small saloon"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "saloon"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "A cozy and intimate space for small gatherings and events."
+                                        },
+                                        "capacity": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "enable": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "image_url": {
+                                            "type": "string",
+                                            "example": "http://example.com/small_space.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Update a space",
+                "operationId": "61d610e4626177b0cfd827becd15ec57",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "type",
+                                    "capacity",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A cozy and intimate space for small gatherings and events."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "saloon"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Result message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Delete reservation",
+                "operationId": "9a02f09477ab5ae7069f5f545a6c6ab0",
+                "responses": {
+                    "200": {
+                        "description": "Result messge",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/space/search?type=${type}&capacity=${capacity}&start_date=${startDate}&end_date=${endDate}": {
+            "get": {
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Available spaces for a given filter",
+                "operationId": "0965fd569cc811960fb0152514d0f8aa",
+                "responses": {
+                    "200": {
+                        "description": "Available Spaces",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Small saloon"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "saloon"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "A cozy and intimate space for small gatherings and events."
+                                            },
+                                            "capacity": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "enable": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "image_url": {
+                                                "type": "string",
+                                                "example": "http://example.com/small_space.jpg"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Reservation",
+            "description": "Reservation"
+        },
+        {
+            "name": "Space",
+            "description": "Space"
+        }
+    ]
+}

@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
@@ -12,7 +13,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware('jwt.auth')->group(function () {
   Route::post('logout', [AuthController::class, 'logout']);
   Route::get('user', [AuthController::class, 'user']);
-  
+
   Route::prefix('reservation')->group(function () {
     Route::post('', [ReservationController::class, 'store']);
     Route::get('', [ReservationController::class, 'get']);
@@ -22,14 +23,13 @@ Route::middleware('jwt.auth')->group(function () {
       Route::delete('', [ReservationController::class, 'delete']);
     });
   });
-  
-  
+
+
   Route::prefix('space')->group(function () {
     Route::get('{id}/daily-available-slots', [SpaceController::class, 'getDailyAvailableTimeSlots']);
-    Route::get('{id}/weekly-available-slots', [SpaceController::class, 'getWeeklyAvailableTimeSlots']);
     Route::get('search', [SpaceController::class, 'query']);
     Route::get('{id}', [SpaceController::class, 'getById']);
-    
+
     Route::middleware(IsAdmin::class)->group(function () {
       Route::post('', [SpaceController::class, 'store']);
       Route::get('', [SpaceController::class, 'get']);
@@ -39,5 +39,4 @@ Route::middleware('jwt.auth')->group(function () {
       });
     });
   });
-
 });

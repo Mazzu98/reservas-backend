@@ -11,34 +11,73 @@ use Carbon\Carbon;
 class ReservationController extends Controller
 {
     /**
-     * return listing of the resource by user.
+     * @OA\Get(
+     *     path="/api/reservation",
+     *     tags={"Reservation"},
+     *     summary="Get user reservations",
+     *   security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=13),
+     *                 @OA\Property(property="space_id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="event_name", type="string", example="Some festival"),
+     *                 @OA\Property(property="start_date", type="string", format="date-time", example="2024-10-02 12:30:00"),
+     *                 @OA\Property(property="end_date", type="string", format="date-time", example="2024-10-02 15:00:00"),
+     *                 @OA\Property(property="space_name", type="string", example="Big saloon")
+     *             )
+     *         ),
+     *        description="User reservations"
+     *    ),
+     * )
      */
     public function get(Request $request)
     {
         $reservations = Reservation::where('user_id', $request->user()->id)
-                ->with('space')
-                ->get()
-                ->map(function ($reservation) {
-                    $reservation->space_name = $reservation->space->name;
-                    return $reservation;
-                });
+            ->with('space')
+            ->get()
+            ->map(function ($reservation) {
+                $reservation->space_name = $reservation->space->name;
+                return $reservation;
+            });
         return response()->json($reservations);
     }
 
     /**
-     * return resource by user.
+     * @OA\Get(
+     *     path="/api/reservation/{id}",
+     *     tags={"Reservation"},
+     *     summary="Get particular user reservation",
+     *  security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="id", type="integer", example=13),
+     *                 @OA\Property(property="space_id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="event_name", type="string", example="Some festival"),
+     *                 @OA\Property(property="start_date", type="string", format="date-time", example="2024-10-02 12:30:00"),
+     *                 @OA\Property(property="end_date", type="string", format="date-time", example="2024-10-02 15:00:00"),
+     *                 @OA\Property(property="space_name", type="string", example="Big saloon")
+     *         ),
+     *        description="User reservation"
+     *    ),
+     * )
      */
     public function getById(int $id, Request $request)
     {
         $reservation = Reservation::where('id', $id)
-                                    ->get()
-                                    ->first();
-                            
+            ->get()
+            ->first();
+
         if (!$reservation) {
             return response()->json(['message' => 'Reservation not found'], 404);
         }
 
-        if($reservation->user_id != $request->user()->id) {
+        if ($reservation->user_id != $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -46,11 +85,33 @@ class ReservationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/reservation",
+     *     tags={"Reservation"},
+     *     summary="Create a reservation",
+     *  security={{ "bearerAuth": {} }},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"space_id","event_name","start_date","end_date"},
+     *              @OA\Property(property="space_id", type="integer", example=1),
+     *              @OA\Property(property="event_name", type="string", example="Some festival"),
+     *              @OA\Property(property="start_date", type="string", format="date-time", example="2024-10-02 12:30:00"),
+     *              @OA\Property(property="end_date", type="string", format="date-time", example="2024-10-02 15:00:00"),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="result message"
+     *    ),
+     * )
      */
     public function store(Request $request)
     {
-        $userId =  $request->user()->id;  
+        $userId =  $request->user()->id;
 
         $request->validate([
             'space_id' => 'required|exists:spaces,id',
@@ -79,9 +140,9 @@ class ReservationController extends Controller
         }
 
         $conflictingReservations = Reservation::where('space_id', $request->space_id)
-                                                ->where('start_date', '<', $request->end_date)
-                                                ->where('end_date', '>', $request->start_date)
-                                                ->exists();
+            ->where('start_date', '<', $request->end_date)
+            ->where('end_date', '>', $request->start_date)
+            ->exists();
 
         if ($conflictingReservations) {
             return response()->json(['message' => 'There is already a reservation that conflicts with the selected time.'], 409);
@@ -108,7 +169,29 @@ class ReservationController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/reservation/{id}",
+     *     tags={"Reservation"},
+     *     summary="Update a reservation",
+     *     security={{ "bearerAuth": {} }},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"space_id","event_name","start_date","end_date"},
+     *              @OA\Property(property="space_id", type="integer", example=1),
+     *              @OA\Property(property="event_name", type="string", example="Some festival"),
+     *              @OA\Property(property="start_date", type="string", format="date-time", example="2024-10-02 12:30:00"),
+     *              @OA\Property(property="end_date", type="string", format="date-time", example="2024-10-02 15:00:00"),
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="Result message"
+     *    ),
+     * )
      */
     public function update(string $id, Request $request)
     {
@@ -141,10 +224,10 @@ class ReservationController extends Controller
         }
 
         $conflictingReservations = Reservation::where('space_id', $request->space_id)
-                                                ->where('id', '!=', $id)
-                                                ->where('start_date', '<', $request->end_date)
-                                                ->where('end_date', '>', $request->start_date)
-                                                ->exists();
+            ->where('id', '!=', $id)
+            ->where('start_date', '<', $request->end_date)
+            ->where('end_date', '>', $request->start_date)
+            ->exists();
 
         if ($conflictingReservations) {
             return response()->json(['message' => 'There is already a reservation that conflicts with the selected time.'], 409);
@@ -157,7 +240,19 @@ class ReservationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/reservation/{id}",
+     *     tags={"Reservation"},
+     *     summary="Delete reservation",
+     *    security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         @OA\JsonContent(
+     *                 @OA\Property(property="message", type="string", example="message"),
+     *         ),
+     *        description="Result messge"
+     *    ),
+     * )
      */
     public function delete(string $id)
     {
