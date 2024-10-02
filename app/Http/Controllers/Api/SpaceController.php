@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Space;
+use App\Models\Reservation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -96,7 +97,7 @@ class SpaceController extends Controller
     }
 
     /**
-     * query the specified resource.
+     * Query the specified resource with available time slots.
      */
     public function query(Request $request)
     {
@@ -115,16 +116,31 @@ class SpaceController extends Controller
             $spaces->where('capacity', '>=', $capacity);
         }
 
-        if ($startDate && $endDate) {
-            $spaces->whereDoesntHave('reservations', function ($query) use ($startDate, $endDate) {
-                $query->where('start_date', '<', $endDate)
-                    ->where('end_date', '>', $startDate);
-            });
+        $allSpaces = $spaces->get();
+        $availableSpaces = [];
+        $timeSlots = Reservation::getTimeSlots(new Carbon($startDate), new Carbon($endDate));
+
+        foreach ($allSpaces as $space) {
+            $spaceHasAvailableTime = false;
+
+            foreach ($timeSlots as $slot) {
+                $overlappingReservations = $space->reservations()->where(function ($query) use ($slot) {
+                    $query->where('start_date', '<', $slot['end'])
+                        ->where('end_date', '>', $slot['start']);
+                })->exists();
+
+                if (!$overlappingReservations) {
+                    $spaceHasAvailableTime = true;
+                    break;
+                }
+            }
+
+            if ($spaceHasAvailableTime) {
+                $availableSpaces[] = $space;
+            }
         }
 
-        $spaces = $spaces->get();
-
-        return response()->json($spaces);
+        return response()->json($availableSpaces);
     }
 
 

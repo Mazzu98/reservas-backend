@@ -9,12 +9,10 @@ use App\Http\Middlewares\IsOwnReservation;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('jwt.auth')->group(function () {
   Route::post('logout', [AuthController::class, 'logout']);
   Route::get('user', [AuthController::class, 'user']);
-  Route::get('spaces/{id}/daily-available-slots', [SpaceController::class, 'getDailyAvailableTimeSlots']);
-  Route::get('spaces/{id}/weekly-available-slots', [SpaceController::class, 'getWeeklyAvailableTimeSlots']);
-
+  
   Route::prefix('reservation')->group(function () {
     Route::post('', [ReservationController::class, 'store']);
     Route::get('', [ReservationController::class, 'get']);
@@ -24,16 +22,21 @@ Route::middleware('auth:api')->group(function () {
       Route::delete('', [ReservationController::class, 'delete']);
     });
   });
-
-  Route::get('space/search', [SpaceController::class, 'query']);
-
-  Route::prefix('space')->middleware(IsAdmin::class)->group(function () {
-    Route::post('', [SpaceController::class, 'store']);
-    Route::get('', [SpaceController::class, 'get']);
-    Route::prefix('{id}')->group(function () {
-      Route::get('', [SpaceController::class, 'getById']);
-      Route::patch('', [SpaceController::class, 'update']);
-      Route::delete('', [SpaceController::class, 'delete']);
+  
+  
+  Route::prefix('space')->group(function () {
+    Route::get('{id}/daily-available-slots', [SpaceController::class, 'getDailyAvailableTimeSlots']);
+    Route::get('{id}/weekly-available-slots', [SpaceController::class, 'getWeeklyAvailableTimeSlots']);
+    Route::get('search', [SpaceController::class, 'query']);
+    Route::get('{id}', [SpaceController::class, 'getById']);
+    
+    Route::middleware(IsAdmin::class)->group(function () {
+      Route::post('', [SpaceController::class, 'store']);
+      Route::get('', [SpaceController::class, 'get']);
+      Route::prefix('{id}')->group(function () {
+        Route::patch('', [SpaceController::class, 'update']);
+        Route::delete('', [SpaceController::class, 'delete']);
+      });
     });
   });
 
