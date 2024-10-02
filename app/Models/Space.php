@@ -33,10 +33,13 @@ class Space extends Model
         return $this->hasMany(Reservation::class);
     }
 
-    static function getAvailableTimeSlots($space_id, $dayStart, $dayEnd)
+    static function getAvailableTimeSlots($space_id, $dayStart, $dayEnd, $reservationIgnore = null)
     {
         $allSlots = Reservation::getTimeSlots((new Carbon($dayStart))->startOfDay(), (new Carbon($dayEnd))->endOfDay());
-        $reservations = Reservation::getReservationsInRange($space_id, $dayStart, $dayEnd);
+        $reservations = Reservation::getReservationsInRange($space_id, $dayStart, $dayEnd)
+                                    ->filter(function ($reservation) use ($reservationIgnore) {
+                                        return $reservation->id != $reservationIgnore;
+                                    });
     
         $availableSlots = [];
     

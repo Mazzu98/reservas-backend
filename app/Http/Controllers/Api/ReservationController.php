@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
-use App\Models\User;
-use App\Models\Space;
 use Carbon\Carbon;
 
 class ReservationController extends Controller
@@ -17,7 +15,12 @@ class ReservationController extends Controller
     public function get(Request $request)
     {
         $reservations = Reservation::where('user_id', $request->user()->id)
-                                    ->get();
+                ->with('space')
+                ->get()
+                ->map(function ($reservation) {
+                    $reservation->space_name = $reservation->space->name;
+                    return $reservation;
+                });
         return response()->json($reservations);
     }
 

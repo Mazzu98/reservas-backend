@@ -26,9 +26,10 @@ class SpaceController extends Controller
      */
     public function getDailyAvailableTimeSlots(int $id, Request $request)
     {
+        $reservationIgnore = $request->query('reservationIgnore');
         $dayStart = Carbon::parse($request->query('day'))->startOfDay();
         $dayEnd = Carbon::parse($request->query('day'))->endOfDay();
-        $spaces = new Collection(Space::getAvailableTimeSlots($id, $dayStart, $dayEnd));
+        $spaces = new Collection(Space::getAvailableTimeSlots($id, $dayStart, $dayEnd, $reservationIgnore));
         $spaces = $spaces->map(function ($space) {
             return [
                 'start' => $space['start']->format('H:i'),
