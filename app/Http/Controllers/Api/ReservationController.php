@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
+use App\Models\Space;
 use Carbon\Carbon;
 
 class ReservationController extends Controller
@@ -72,6 +73,11 @@ class ReservationController extends Controller
             return response()->json(['message' => "The limit end time is {$endHour}:00."], 422);
         }
 
+        $space = Space::findOrFail($request->space_id)->where('enable', true);
+        if (!$space) {
+            return response()->json(['message' => 'The selected space is not available.'], 409);
+        }
+
         $conflictingReservations = Reservation::where('space_id', $request->space_id)
                                                 ->where('start_date', '<', $request->end_date)
                                                 ->where('end_date', '>', $request->start_date)
@@ -127,6 +133,11 @@ class ReservationController extends Controller
 
         if ($endDate->hour > $endHour) {
             return response()->json(['message' => "The limit end time is {$endHour}:00."], 422);
+        }
+
+        $space = Space::findOrFail($request->space_id)->where('enable', true);
+        if (!$space) {
+            return response()->json(['message' => 'The selected space is not available.'], 409);
         }
 
         $conflictingReservations = Reservation::where('space_id', $request->space_id)

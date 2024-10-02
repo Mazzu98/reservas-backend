@@ -17,7 +17,8 @@ class SpaceController extends Controller
      */
     public function get()
     {
-        $spaces = Space::all();
+        $spaces = Space::where('enable', true)
+                        ->get();
         return response()->json($spaces);
     }
 
@@ -117,7 +118,9 @@ class SpaceController extends Controller
             $spaces->where('capacity', '>=', $capacity);
         }
 
-        $allSpaces = $spaces->get();
+        $allSpaces = $spaces->where('enable', true)
+                            ->get();
+                            
         $availableSpaces = [];
         $timeSlots = Reservation::getTimeSlots(new Carbon($startDate), new Carbon($endDate));
 
@@ -175,13 +178,13 @@ class SpaceController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * soft delete the specified resource from storage.
      */
     public function delete(string $id)
     {
         $space = Space::findOrFail($id);
-        Storage::delete('public/' . $space->image);
-        $space->delete();
+        $space->enable = false;
+        $space->save();
 
         return response()->json(['message' => 'Space deleted successfully']);
     }
