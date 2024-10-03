@@ -12,7 +12,7 @@ class SpaceFactory extends Factory
     {
         return [
             'name' => $this->faker->word,
-            'type' => $this->faker->sentence,
+            'type' => $this->faker->word,
             'description' => $this->faker->sentence,
             'image' => $this->faker->imageUrl(),
             'capacity' => $this->faker->numberBetween(1, 100),
