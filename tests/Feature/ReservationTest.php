@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Space;
@@ -94,7 +92,7 @@ class ReservationTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $token)
             ->getJson('/api/space/search?type=strangeTypeToNotColis&capacity=20')
             ->assertStatus(200)
-            ->assertJsonCount(2) // Solo un espacio debería ser devuelto.
+            ->assertJsonCount(2)
             ->assertJsonFragment(['type' => 'strangeTypeToNotColision']);
 
         DB::rollBack();

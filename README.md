@@ -12,7 +12,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes requisitos:
 
 1. **Clonar el repositorio:**
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
+    git clone https://github.com/Mazzu98/reservas-backend.git
     ```
 
 2. **Moverse al directorio del proyecto:**
@@ -35,3 +35,11 @@ Antes de comenzar, asegúrate de tener instalados los siguientes requisitos:
     ```
 
 ¡Listo! Ahora el proyecto debería estar corriendo.
+
+**Correr tests**
+```bash
+    php artisan test
+```
+
+**Documentacion Swagger**
+Una vez este levantado el servidor, deberia encontrarse en [localhost:8000/api/documentation](http://localhost:8000/api/documentation)
